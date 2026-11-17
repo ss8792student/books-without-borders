@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Books Without Borders</title>
+<meta name="description" content="Books Without Borders is a youth-led 501(c)(3) nonprofit making free children's books in languages that have very few.">
+<link rel="icon" href="img/logo-emblem.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400;1,700&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the site is a clothbound book. Dark bookcloth bands open each page,
+   paper sheets carry the reading, a gilt ribbon tracks how far you've read, and
+   moving between pages turns a leaf. Text is left-aligned throughout. */
+:root{
+  --cloth:#33241A;        /* bookcloth, darkest brown */
+  --cloth-2:#4A3425;      /* lighter cloth, bars and rules on dark */
+  --paper:#EDE0C4;        /* page stock */
+  --paper-2:#E2D1AC;      /* older, yellower stock for cards */
+  --ink:#2B1D13;          /* body text */
+  --ink-soft:#5F4833;     /* secondary text */
+  --gilt:#C4962A;         /* gold stamping, used on cloth */
+  --gilt-deep:#7A5A0E;    /* gold that stays readable on paper */
+  --rule:rgba(43,29,19,.24);
+  --display:"Libre Caslon Display","Libre Caslon Text","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --caslon:"Libre Caslon Text","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --body:"Gentium Book Plus","Gentium Plus","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .22  0 0 0 0 .14  0 0 0 0 .07  0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --weave:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.1) 0 1px,transparent 1px 3px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper) var(--grain);color:var(--ink);font-family:var(--body);font-size:1.125rem;line-height:1.65;overflow-x:hidden}
+img,svg{max-width:100%}
+img{height:auto;display:block}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.3rem,5.4vw,3.9rem);letter-spacing:-.005em}
+h2{font-size:clamp(1.7rem,3.2vw,2.45rem)}
+h3{font-family:var(--caslon);font-weight:700;font-size:1.18rem;line-height:1.3}
+p{margin:0;max-width:64ch}
+a{color:inherit;text-decoration-color:var(--gilt-deep);text-decoration-thickness:1.5px;text-underline-offset:.18em}
+a:hover{text-decoration-color:currentColor}
+:focus-visible{outline:2px solid var(--gilt);outline-offset:3px;border-radius:2px}
+.wrap{width:min(1120px,100% - 48px);margin-inline:auto}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gilt);color:var(--ink);padding:8px 14px;z-index:99}
+.skip:focus{left:12px}
+
+/* running head */
+.head{position:sticky;top:0;z-index:40;background:var(--weave),var(--cloth);color:var(--paper);border-bottom:1px solid rgba(196,150,42,.45)}
+.head .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none}
+.mark .em{height:46px;width:auto}
+.mark .wm{height:40px;width:auto}
+.nav{display:flex;align-items:center;gap:4px}
+.nav a{font-family:var(--caslon);font-size:.95rem;text-decoration:none;padding:8px 12px;border-bottom:2px solid transparent;color:rgba(237,224,196,.82)}
+.nav a:hover{color:var(--paper)}
+.nav a[aria-current="page"]{color:var(--paper);border-bottom-color:var(--gilt)}
+.nav a.give{background:var(--gilt);color:var(--ink);border-radius:2px;border-bottom-color:transparent;margin-left:8px;padding:8px 16px}
+.nav a.give:hover{background:#d5a63a}
+.menu{display:none;font:inherit;font-family:var(--caslon);font-size:.95rem;background:none;border:1px solid rgba(237,224,196,.5);color:var(--paper);padding:6px 14px;border-radius:2px;cursor:pointer}
+@media (max-width:900px){
+  .menu{display:block}
+  .nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--weave),var(--cloth);flex-direction:column;align-items:stretch;padding:8px 24px 20px;border-bottom:1px solid rgba(196,150,42,.45)}
+  .nav.open{display:flex}
+  .nav a{padding:12px 4px;border-bottom:1px solid rgba(237,224,196,.14)}
+  .nav a.give{margin:12px 0 0;text-align:center}
+  .mark .em{height:40px}.mark .wm{height:34px}
+}
+
+/* ribbon bookmark: grows as you read down the page */
+.ribbon{position:fixed;top:0;right:14px;width:13px;z-index:45;height:calc(92px + var(--p,0)*(100vh - 156px));background:linear-gradient(90deg,#a87f1f,var(--gilt) 45%,#a87f1f);clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 9px),0 100%);pointer-events:none}
+@media (max-width:900px){.ribbon{display:none}}
+
+/* the turning leaf */
+.leaf{position:fixed;inset:0;z-index:60;pointer-events:none;background:var(--paper) var(--grain);transform:translateX(104%);box-shadow:-30px 0 70px rgba(0,0,0,.4)}
+.leaf::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(43,29,19,.22),transparent 9%,transparent 93%,rgba(43,29,19,.16))}
+.leaf.turn{animation:turn .72s cubic-bezier(.62,0,.3,1)}
+@keyframes turn{0%{transform:translateX(104%)}44%,56%{transform:translateX(0)}100%{transform:translateX(-104%)}}
+
+.page[hidden]{display:none}
+.band{padding:clamp(56px,8vw,104px) 0}
+.band + .band{border-top:1px solid var(--rule)}
+.cloth{background:var(--weave),var(--cloth);color:var(--paper)}
+.cloth + .band,.band + .cloth{border-top:0}
+.cloth p{color:rgba(237,224,196,.86)}
+.cloth .card p{color:var(--ink)}
+.lede{font-size:1.28rem;line-height:1.55}
+.soft{color:var(--ink-soft)}
+.small{font-size:.95rem;line-height:1.5}
+
+.btn{display:inline-block;font-family:var(--caslon);font-size:1rem;line-height:1.2;text-decoration:none;padding:13px 22px;border-radius:2px;border:1.5px solid var(--cloth);background:var(--cloth);color:var(--paper);cursor:pointer}
+.btn:hover{background:var(--cloth-2)}
+.btn.line{background:transparent;color:var(--ink)}
+.btn.line:hover{background:rgba(43,29,19,.08)}
+.cloth .btn{background:var(--gilt);border-color:var(--gilt);color:var(--ink)}
+.cloth .btn:hover{background:#d5a63a}
+.cloth .btn.line{background:transparent;color:var(--paper);border-color:rgba(237,224,196,.6)}
+.cloth .btn.line:hover{background:rgba(237,224,196,.1)}
+.row{display:flex;flex-wrap:wrap;gap:14px}
+
+/* cover (home hero) */
+.cover{padding:clamp(48px,7vw,92px) 0 clamp(56px,7vw,96px)}
+.cover .wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(32px,6vw,80px);align-items:center}
+@media (max-width:900px){.cover .wrap{grid-template-columns:1fr}}
+.thesis{font-size:clamp(2.35rem,5.9vw,4.5rem);line-height:1.5;color:var(--paper);text-wrap:wrap;margin-top:-.3em}
+.fix{display:inline-block;position:relative;text-align:center;white-space:nowrap;vertical-align:baseline;line-height:1.5}
+.fix ins{display:block;font-family:var(--caslon);font-style:italic;font-size:.47em;line-height:1.05;color:var(--gilt);text-decoration:none;transform:rotate(-1.2deg);animation:inked .5s 1.15s both}
+.fix del{display:block;position:relative;text-decoration:none;color:rgba(237,224,196,.5);line-height:1.12}
+.fix del::after{content:"";position:absolute;left:-3%;right:-3%;top:56%;height:.055em;background:var(--gilt);transform-origin:left;animation:strike .55s .5s both}
+.fix::after{content:"";position:absolute;left:50%;bottom:-.2em;width:.2em;height:.2em;border-left:2px solid var(--gilt);border-top:2px solid var(--gilt);transform:translateX(-50%) rotate(45deg);animation:inked .3s 1.05s both}
+.fix + .fix ins{animation-delay:1.75s}
+@keyframes strike{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes inked{from{opacity:0}to{opacity:1}}
+.cover .lede{margin-top:1.6rem;max-width:56ch}
+.cover .row{margin-top:2rem}
+
+/* pilot shelf card */
+.card{background:var(--paper-2) var(--grain);color:var(--ink);padding:26px 26px 22px;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 18px 40px rgba(0,0,0,.35);border-radius:2px}
+.shelfcard{transform:rotate(1.4deg)}
+.shelfcard h2{font-size:1.5rem}
+.shelf{display:flex;align-items:flex-end;gap:9px;height:176px;border-bottom:7px solid var(--cloth);padding:0 6px;margin-top:14px}
+.spine{font:inherit;padding:0;cursor:pointer;border:1.5px dashed var(--ink-soft);background:transparent;border-radius:2px 2px 0 0;position:relative;transition:transform .18s}
+.spine:hover,.spine:focus-visible,.spine.sel{transform:translateY(-8px)}
+.spine[data-stage="1"]{border-style:solid;background:rgba(74,52,37,.16)}
+.spine[data-stage="2"]{border-style:solid;background:linear-gradient(0deg,var(--cloth-2) 55%,rgba(74,52,37,.16) 55%)}
+.spine[data-stage="3"]{border:0;background:var(--weave),var(--cloth)}
+.spine[data-stage="3"]::before,.spine[data-stage="3"]::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--gilt)}
+.spine[data-stage="3"]::before{top:16px}.spine[data-stage="3"]::after{bottom:16px}
+.shelfnote{margin-top:14px;min-height:3.1em}
+.key{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;padding-top:12px;border-top:1px solid var(--rule);font-size:.86rem;color:var(--ink-soft)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:11px;height:15px;display:inline-block;border:1.5px dashed var(--ink-soft)}
+.key i.s1{border-style:solid;background:rgba(74,52,37,.16)}
+.key i.s2{border-style:solid;background:linear-gradient(0deg,var(--cloth-2) 55%,transparent 55%)}
+.key i.s3{border:0;background:var(--cloth)}
+
+/* two-column reading spread */
+.spread{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(32px,6vw,84px);align-items:start}
+@media (max-width:860px){.spread{grid-template-columns:1fr}}
+
+/* photographs, mounted like plates in a book */
+figure{margin:0}
+.plate{background:#F3E9D2 var(--grain);padding:10px 10px 0;box-shadow:0 12px 30px rgba(43,29,19,.24);border-radius:2px}
+.plate img{width:100%;border-radius:1px}
+.plate figcaption{font-family:var(--caslon);font-style:italic;font-size:.92rem;color:var(--ink-soft);padding:9px 4px 11px}
+.plates{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-top:22px;align-items:start}
+@media (max-width:700px){.plates{grid-template-columns:1fr}}
+
+/* ledger, set like a library checkout card */
+.ledger{background:var(--paper-2) var(--grain);padding:24px 26px 20px;border-radius:2px;box-shadow:0 10px 28px rgba(43,29,19,.2);border-left:3px double var(--gilt-deep)}
+.ledger h3{font-family:var(--display);font-weight:400;font-size:1.45rem}
+.ledger dl{margin:14px 0 0}
+.ledger .ln{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule)}
+.ledger dt{flex:none}
+.ledger .ln::before{content:"";order:1;flex:1;border-bottom:2px dotted var(--ink-soft);opacity:.55;transform:translateY(-.25em)}
+.ledger dd{order:2;margin:0;font-family:var(--display);font-size:1.7rem;line-height:1;font-variant-numeric:tabular-nums lining-nums}
+.plate + .ledger{margin:20px 0 0}
+
+/* gap chart */
+.gap{margin-top:30px;position:relative;display:grid;gap:10px;max-width:880px}
+.bar{display:grid;grid-template-columns:7.2em minmax(0,1fr);align-items:center;gap:14px;padding:3px 0;border-radius:2px;cursor:default}
+.bar .lang{font-family:var(--caslon);font-size:1rem}
+.bar .track{display:flex;align-items:center;gap:10px;border-left:1px solid var(--ink-soft)}
+.bar .fill{height:18px;background:var(--cloth-2);border-radius:0 4px 4px 0;min-width:3px;flex:none}
+.bar .val{font-variant-numeric:tabular-nums lining-nums;font-size:1rem;color:var(--ink)}
+.bar:hover .fill,.bar:focus-visible .fill{background:var(--cloth)}
+.tip{position:absolute;z-index:5;background:var(--cloth);color:var(--paper);font-size:.9rem;line-height:1.35;padding:8px 12px;border-radius:2px;pointer-events:none;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.tip[hidden]{display:none}
+
+/* contents page */
+.toc{list-style:none;margin:28px 0 0;padding:0;max-width:880px}
+.toc a{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:18px 0;border-bottom:1px solid var(--rule);text-decoration:none}
+.toc li:first-child a{border-top:1px solid var(--rule)}
+.toc .t{display:flex;align-items:baseline;gap:12px;font-family:var(--display);font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.2}
+.toc .t::after{content:"";flex:1;border-bottom:2px dotted var(--ink-soft);opacity:.5;transform:translateY(-.22em);order:1}
+.toc .t em{order:2;font-family:var(--caslon);font-size:1rem;color:var(--gilt-deep)}
+.toc .d{color:var(--ink-soft);font-size:1.02rem}
+.toc a:hover .t,.toc a:focus-visible .t{color:var(--gilt-deep)}
+
+/* roadmap */
+.road{list-style:none;margin:34px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.road li{position:relative;padding:26px 22px 0 0;border-top:2px solid var(--cloth-2)}
+.road li::before{content:"";position:absolute;top:-8px;left:0;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--cloth-2)}
+.road li.now::before{background:var(--gilt);border-color:var(--cloth)}
+.road li.done::before{background:var(--cloth-2)}
+.road .when{font-family:var(--caslon);font-size:.95rem;color:var(--gilt-deep)}
+.road h3{margin:4px 0 8px;font-family:var(--display);font-weight:400;font-size:1.5rem}
+.road p{font-size:1rem;line-height:1.55}
+.here{display:inline-block;font-family:var(--caslon);font-style:italic;font-size:.9rem;background:var(--gilt);color:var(--ink);padding:1px 10px;border-radius:2px;margin-left:8px;transform:rotate(-1.5deg)}
+@media (max-width:860px){
+  .road{grid-template-columns:1fr}
+  .road li{border-top:0;border-left:2px solid var(--cloth-2);padding:0 0 28px 26px}
+  .road li::before{top:4px;left:-8px}
+}
+
+/* chapter openers on inner pages */
+.opener{padding:clamp(44px,6vw,80px) 0 clamp(40px,5vw,64px)}
+.opener h1{color:var(--paper)}
+.opener .lede{margin-top:1.1rem;max-width:58ch}
+
+/* scrolly: one sentence, start to finish */
+.scrolly{display:grid;grid-template-columns:1fr;gap:28px;margin-top:24px}
+.step{display:flex;flex-direction:column;gap:16px;padding:22px 0;border-top:1px solid var(--rule)}
+.step .no{font-family:var(--display);font-size:3rem;line-height:1;color:var(--gilt-deep)}
+.step h3{font-family:var(--display);font-weight:400;font-size:1.7rem;line-height:1.15}
+.sheet{background:#F3E9D2 var(--grain);padding:26px 26px 24px;border-radius:2px;box-shadow:0 14px 34px rgba(43,29,19,.24);position:relative}
+.sheet .tag{font-family:var(--caslon);font-style:italic;font-size:.98rem;color:var(--gilt-deep)}
+.sheet blockquote{margin:12px 0 0;font-family:var(--caslon);font-size:clamp(1.25rem,2.2vw,1.55rem);line-height:1.5}
+.sheet .stamp{position:absolute;right:20px;bottom:18px;font-family:var(--caslon);font-weight:700;font-size:.95rem;color:var(--gilt-deep);border:2px solid var(--gilt-deep);border-radius:50%;width:92px;height:92px;display:grid;place-items:center;text-align:center;line-height:1.15;transform:rotate(-12deg);opacity:.85}
+.sheet.has-stamp{padding-bottom:104px}
+mark{background:none;color:inherit;padding:0 .08em}
+mark.x{background:linear-gradient(0deg,rgba(196,150,42,.5),rgba(196,150,42,.5)) 0 88%/100% .38em no-repeat}
+mark.ok{border-bottom:2px solid var(--gilt-deep)}
+.notes{list-style:none;margin:16px 0 0;padding:14px 0 0;border-top:1px solid var(--rule);display:grid;gap:8px;font-size:1rem;line-height:1.45}
+.notes b{font-family:var(--caslon)}
+.rec{margin:14px 0 0;display:grid;gap:0;font-size:.98rem;line-height:1.45}
+.rec div{display:grid;grid-template-columns:8.4em minmax(0,1fr);gap:12px;padding:7px 0;border-top:1px solid var(--rule)}
+.rec dt{font-family:var(--caslon);font-style:italic;color:var(--ink-soft)}
+.rec dd{margin:0}
+@media (min-width:860px){
+  .scrolly{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:64px}
+  .panel{position:sticky;top:108px;align-self:start;display:grid;order:2}
+  .panel .sheet{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;align-self:start}
+  .panel .sheet.on{opacity:1;visibility:visible}
+  .step{min-height:58vh;justify-content:center;border-top:0;opacity:.45;transition:opacity .3s}
+  .step.on{opacity:1}
+  .step:first-child{min-height:44vh;justify-content:flex-start;padding-top:8px}
+}
+
+/* license checker and role picker share the chip control */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{font:inherit;font-family:var(--caslon);font-size:1rem;line-height:1.2;padding:11px 16px;border:1.5px solid var(--cloth);background:transparent;color:var(--ink);border-radius:2px;cursor:pointer;text-align:left}
+.chip:hover{background:rgba(43,29,19,.08)}
+.chip[aria-pressed="true"]{background:var(--cloth);color:var(--paper)}
+.verdict{margin-top:20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:baseline;max-width:760px;border-top:1px solid var(--rule);padding-top:18px}
+.verdict strong{font-family:var(--display);font-weight:400;font-size:2.6rem;line-height:1}
+.verdict strong.no{color:var(--ink-soft)}
+
+/* glossary */
+.gloss{margin:26px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 56px}
+.gloss div{padding:14px 0;border-bottom:1px solid var(--rule)}
+.gloss dt{font-family:var(--caslon);font-weight:700}
+.gloss dd{margin:2px 0 0;color:var(--ink-soft);font-size:1.02rem;line-height:1.5}
+@media (max-width:760px){.gloss{grid-template-columns:1fr}}
+.plain{margin:18px 0 0;padding:0 0 0 1.1em;max-width:64ch;display:grid;gap:10px}
+.outs{margin:26px 0 0;display:grid;gap:0;max-width:900px}
+.outs div{display:grid;grid-template-columns:9em minmax(0,1fr);gap:24px;padding:18px 0;border-top:1px solid var(--rule)}
+.outs dt{font-family:var(--display);font-size:1.5rem;line-height:1.2}
+.outs dd{margin:0}
+@media (max-width:640px){.outs div{grid-template-columns:1fr;gap:4px}}
+
+/* story timeline */
+.time{list-style:none;margin:0;padding:0;border-left:2px solid var(--cloth-2);max-width:860px}
+.time > li{position:relative;padding:0 0 52px 34px}
+.time > li:last-child{padding-bottom:0}
+.time > li::before{content:"";position:absolute;left:-8px;top:8px;width:14px;height:14px;border-radius:50%;background:var(--gilt);border:2px solid var(--cloth)}
+.time .when{font-family:var(--caslon);font-style:italic;color:var(--gilt-deep)}
+.time h2{margin:2px 0 14px}
+.time .ledger{margin-top:20px;max-width:440px}
+.dropcap::first-letter{font-family:var(--display);font-size:3.9em;line-height:.8;float:left;padding:.07em .1em 0 0;color:var(--gilt-deep)}
+.creed{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.9rem);line-height:1.2;color:var(--paper);max-width:22ch}
+
+/* join */
+.role{margin-top:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:start}
+@media (max-width:860px){.role{grid-template-columns:1fr}}
+.role h3{font-family:var(--display);font-weight:400;font-size:1.8rem;line-height:1.15}
+.form{display:grid;gap:14px}
+.form label{display:grid;gap:5px;font-family:var(--caslon);font-size:.98rem}
+.form input{font:inherit;font-size:1.05rem;padding:10px 12px;border:1.5px solid var(--ink-soft);border-radius:2px;background:#F6EEDB;color:var(--ink);width:100%}
+.letter{white-space:pre-wrap;font-family:var(--body);font-size:1.02rem;line-height:1.55;margin:0;padding:16px 18px;background:#F6EEDB;border-left:3px double var(--gilt-deep);overflow-wrap:anywhere}
+.status{min-height:1.4em;font-size:.95rem;color:var(--ink-soft)}
+
+/* colophon */
+.colophon{background:var(--weave),var(--cloth);color:rgba(237,224,196,.84);padding:56px 0 34px;border-top:3px double var(--gilt)}
+.colophon .cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.2fr);gap:40px}
+@media (max-width:800px){.colophon .cols{grid-template-columns:1fr}}
+.colophon .em{height:78px;width:auto;margin-bottom:6px}
+.colophon h2{font-size:1.25rem;color:var(--paper);margin-bottom:10px}
+.colophon ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.colophon a{text-decoration-color:rgba(196,150,42,.7)}
+.colophon .fine{margin-top:40px;padding-top:18px;border-top:1px solid rgba(237,224,196,.18);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
+.colophon .fine p{max-width:none}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+
+<header class="head">
+  <div class="wrap">
+    <a class="mark" href="#home" aria-label="Books Without Borders, home">
+      <img class="em" src="img/logo-emblem.png" width="463" height="433" alt="">
+      <img class="wm" src="img/logo-wordmark-gold.png" width="438" height="231" alt="Books Without Borders">
+    </a>
+    <button class="menu" id="menu-btn" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav class="nav" id="site-nav" aria-label="Pages">
+      <a href="#method">How a book is made</a>
+      <a href="#research">Open research</a>
+      <a href="#story">Our story</a>
+      <a href="#join">Get involved</a>
+      <a class="give" href="#give">Donate</a>
+    </nav>
+  </div>
+</header>
+
+<div class="ribbon" aria-hidden="true"></div>
+<div class="leaf" aria-hidden="true"></div>
+
+<main id="main">
+
+<!-- ================= HOME ================= -->
+<section class="page" data-page="home">
+  <div class="cloth cover">
+    <div class="wrap">
+      <div>
+        <h1 class="thesis" aria-label="We make books for children whose language has almost none.">
+          <span aria-hidden="true">We <span class="fix"><ins>make</ins><del>collect</del></span> books for children <span class="fix"><ins>whose language has</ins><del>who have</del></span> almost none.</span>
+        </h1>
+        <p class="lede">Books Without Borders is a youth-led 501(c)(3) nonprofit. We translate openly licensed picture books into languages that have very few. An AI model writes the first draft, native speakers fix every line, and the finished books are free to read, print and share.</p>
+        <div class="row">
+          <a class="btn" href="#method">See how a book is made</a>
+          <a class="btn line" href="#join">Review books in your language</a>
+        </div>
+      </div>
+      <aside class="card shelfcard" aria-label="Pilot shelf status">
+        <h2>The pilot shelf</h2>
+        <div class="shelf" id="shelf"></div>
+        <p class="small shelfnote" id="shelf-note" aria-live="polite"></p>
+        <div class="key" aria-hidden="true">
+          <span><i></i>Being chosen</span><span><i class="s1"></i>Drafted</span><span><i class="s2"></i>In review</span><span><i class="s3"></i>Published</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap spread">
+      <div class="stack">
+        <h2>Second edition</h2>
+        <p>Books Without Borders started in 2025 with book drives. In July 2025 we gave 83 books and merit-based scholarships to a government school in Telangana, India, with more than 240 students in grades 6 through 10.</p>
+        <p>A donated book helps the one school that receives it. A translated book with an open license can be read, printed and reused anywhere, for free, in the language a child speaks at home.</p>
+        <p>So in November 2026 we stopped collecting books and started making them.</p>
+        <p><a href="#story">Read our story so far</a></p>
+      </div>
+      <div>
+        <figure class="plate">
+          <img src="img/books.jpg" width="1043" height="784" alt="Stacks of donated paperback books on a desk">
+          <figcaption>Books from our July 2025 donation in Telangana, India.</figcaption>
+        </figure>
+        <div class="ledger">
+          <h3>First edition, 2025</h3>
+          <dl>
+            <div class="ln"><dt>Books donated</dt><dd>83</dd></div>
+            <div class="ln"><dt>Students served</dt><dd>240</dd></div>
+            <div class="ln"><dt>Raised in donations</dt><dd>$101</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="stack">
+        <h2>How many free picture books does a child get?</h2>
+        <p>It depends on the language. These are the free children's books listed in StoryWeaver and Bloom Library, two of the largest open libraries, added together. Telugu has 991. Tigrinya has 14.</p>
+      </div>
+      <div class="gap" id="gap" role="list" aria-label="Free children's books by language"></div>
+      <p class="small soft" style="margin-top:18px">Counted November 14, 2026. A book listed in both libraries is counted twice. Hover or tap a bar for the split.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>Contents</h2>
+      <ul class="toc">
+        <li><a href="#method"><span class="t">How a book is made<em>the method</em></span><span class="d">Follow one sentence from the model's draft to the finished page.</span></a></li>
+        <li><a href="#research"><span class="t">Open research<em>the data</em></span><span class="d">Every correction becomes public data on where AI translation goes wrong.</span></a></li>
+        <li><a href="#story"><span class="t">Our story so far<em>2025 to now</em></span><span class="d">83 books, 240 students, and why we changed course.</span></a></li>
+        <li><a href="#join"><span class="t">Get involved<em>five ways</em></span><span class="d">Review a book, bring us a partner, or start a chapter.</span></a></li>
+        <li><a href="#give"><span class="t">Donate<em>what it pays for</em></span><span class="d">Printing, translation costs and thank-yous for reviewers.</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="stack">
+        <h2>The plan, one language at a time</h2>
+        <p>We work on a single language until it has at least 10 finished books. Our first language is being chosen now with speakers in North Texas, and we'll name it here once our community partner says yes.</p>
+      </div>
+      <ol class="road" id="road">
+        <li data-start="2026-11-09" data-end="2026-11-29"><span class="when">November 2026</span><h3>Set up</h3><p>Choose the language. Find a community partner. Every reviewer signs a consent form before any work starts.</p></li>
+        <li data-start="2026-11-30" data-end="2027-01-03"><span class="when">December to January 3</span><h3>Pilot</h3><p>Five reviewed books published. The first dataset and our code go public.</p></li>
+        <li data-start="2027-01-04" data-end="2027-03-31"><span class="when">January to March 2027</span><h3>Build</h3><p>15 to 20 books. Findings written up and submitted for peer review.</p></li>
+        <li data-start="2027-04-01" data-end="2027-08-31"><span class="when">April to August 2027</span><h3>Grow</h3><p>Dataset version 1.0. Monthly story hours. A playbook so another team can start a new language.</p></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="cloth band">
+    <div class="wrap stack">
+      <h2>Do you speak a language with very few children's books?</h2>
+      <p class="lede">We need native speakers to read short picture-book drafts and fix what the model got wrong. You're credited by name in the book if you'd like to be.</p>
+      <div class="row"><a class="btn" href="#join">Become a reviewer</a><a class="btn line" href="#give">Donate</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section class="page" data-page="method" hidden>
+  <div class="cloth opener">
+    <div class="wrap">
+      <h1>How a book is made</h1>
+      <p class="lede">Machine translation is fast and, in languages with little written material online, often wrong. Native speakers are right and short on time. We put the two together and publish nothing until two people who grew up with the language have read it.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>One sentence, start to finish</h2>
+      <p class="small soft" style="margin-top:10px">An illustration. Real drafts and fixes are in the target language. Here they're shown read back in English so anyone can follow.</p>
+      <div class="scrolly">
+        <div class="panel" id="panel" aria-hidden="true"></div>
+        <ol class="steps" id="steps" style="list-style:none;margin:0;padding:0">
+          <li class="step on">
+            <div><span class="no">1</span><h3>We pick a book we're allowed to translate</h3></div>
+            <p>Source books come from StoryWeaver and Bloom Library, where authors and illustrators have published under open licenses. We choose early readers with short sentences and strong pictures, and our community partner helps pick the topics.</p>
+            <div class="sheet has-stamp">
+              <span class="tag">The source page</span>
+              <blockquote>"Don't be afraid," Grandmother told the little goat. "The moon is only sleeping."</blockquote>
+              <span class="stamp">CC BY<br>4.0</span>
+            </div>
+          </li>
+          <li class="step">
+            <div><span class="no">2</span><h3>A model writes the first draft</h3></div>
+            <p>Every book goes through the same fixed prompt, saved in public with the rest of our code. We run more than one model on each book so we can compare them later.</p>
+            <div class="sheet">
+              <span class="tag">The model's draft, read back in English</span>
+              <blockquote>"Do not fear," the old woman informed the small goat. "The moon is merely asleep."</blockquote>
+            </div>
+          </li>
+          <li class="step">
+            <div><span class="no">3</span><h3>Two native speakers review it, separately</h3></div>
+            <p>Each reviewer works alone from a one-page guide. They fix the line and tag what kind of mistake it was. They don't see each other's changes.</p>
+            <div class="sheet">
+              <span class="tag">Two reviews of the same draft</span>
+              <blockquote>"Do not fear," <mark class="x">the old woman</mark> <mark class="x">informed</mark> the small goat. "The moon is <mark class="x">merely</mark> asleep."</blockquote>
+              <ul class="notes">
+                <li><b>Reviewer one:</b> "the old woman" is a mistranslation, she's the goat's grandmother. "Informed" is the wrong register. Nobody talks to a child like that.</li>
+                <li><b>Reviewer two:</b> agrees on "the old woman." Also marks "merely" as too hard for a first reader.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="step">
+            <div><span class="no">4</span><h3>A third reader settles the differences</h3></div>
+            <p>Where the two reviews disagree, a third native speaker decides. Changes made to fit the culture, like swapping a food or a name, are logged separately because they aren't errors.</p>
+            <div class="sheet">
+              <span class="tag">The corrected line</span>
+              <blockquote>"Don't be afraid," <mark class="ok">Grandmother</mark> <mark class="ok">said to</mark> the little goat. "The moon is <mark class="ok">only</mark> sleeping."</blockquote>
+              <ul class="notes"><li>Both reviewers' fixes were kept.</li></ul>
+            </div>
+          </li>
+          <li class="step">
+            <div><span class="no">5</span><h3>The book goes out free, and so do the corrections</h3></div>
+            <p>The finished book is published with every original credit, plus the reviewers' names if they want them there. Each corrected line becomes one row in an open dataset.</p>
+            <div class="sheet">
+              <span class="tag">One row of the dataset</span>
+              <dl class="rec">
+                <div><dt>source_en</dt><dd>"Don't be afraid," Grandmother told the little goat.</dd></div>
+                <div><dt>draft</dt><dd>the model's line, in the target language</dd></div>
+                <div><dt>corrected</dt><dd>the reviewed line, in the target language</dd></div>
+                <div><dt>error_tags</dt><dd>mistranslation, register, reading level</dd></div>
+                <div><dt>review_seconds</dt><dd>how long the fix took</dd></div>
+              </dl>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>Can we translate it?</h2>
+      <p style="margin-top:14px">It depends on the license the author chose. Pick one.</p>
+      <div class="chips" id="lic" role="group" aria-label="License"></div>
+      <div class="verdict" aria-live="polite"><strong id="lic-word"></strong><p id="lic-why"></p></div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap spread">
+      <div class="stack">
+        <h2>Where the books go</h2>
+        <p>Finished books will be free to read and download on StoryWeaver and Bloom Library, the same open libraries the source books come from.</p>
+        <p>We'll print a small run of each title for the community partner who helped make it. Printed copies carry a QR code that opens the free digital and audio versions, and we'll record narration so the books work as talking books too.</p>
+        <p>Then we read them out loud. The plan is a launch read-aloud with our partner and a story hour every month after that.</p>
+      </div>
+      <div class="stack">
+        <h3>Have a place for a story hour?</h3>
+        <p>Libraries, schools and community centers can host one, and families get the books free.</p>
+        <p><a class="btn line" href="#join">Tell us about it</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESEARCH ================= -->
+<section class="page" data-page="research" hidden>
+  <div class="cloth opener">
+    <div class="wrap">
+      <h1>Open research</h1>
+      <p class="lede">Every book we make leaves behind a record of each line the model got wrong and how a native speaker fixed it. We publish that record so other people can use it.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap spread">
+      <div class="stack">
+        <h2>The question</h2>
+        <p class="lede">How do AI models fail when they translate children's books into a language they've seen very little of? And do the automatic scores researchers rely on notice?</p>
+      </div>
+      <div class="stack">
+        <p>We run three or four models, some commercial and some open, on the same books with the same prompt. Native speakers rate every draft from 1 to 5 for accuracy, fluency and fit for a young reader, and we time each review.</p>
+        <p>Then we check whether two standard metrics (chrF++ and COMET) and an AI judge agree with the people.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>What reviewers mark</h2>
+      <p style="margin-top:14px">Ten tags, adapted from the MQM framework translators use. Reviewers pick one for every fix.</p>
+      <dl class="gloss">
+        <div><dt>Mistranslation</dt><dd>The draft says something the story doesn't.</dd></div>
+        <div><dt>Omission or addition</dt><dd>Words dropped, or words the author never wrote.</dd></div>
+        <div><dt>Agreement and morphology</dt><dd>Endings that don't match in gender, number, tense or case.</dd></div>
+        <div><dt>Honorifics and register</dt><dd>Too formal, too casual, or the wrong form of respect.</dd></div>
+        <div><dt>Word order</dt><dd>Every word right, in an order no speaker would use.</dd></div>
+        <div><dt>Dialect or script</dt><dd>The wrong regional variety, spelling system or text encoding.</dd></div>
+        <div><dt>Loanwords</dt><dd>A borrowed word where the language has its own, or the reverse.</dd></div>
+        <div><dt>Idioms</dt><dd>A saying translated word for word.</dd></div>
+        <div><dt>Reading level</dt><dd>Correct, but too hard for a child learning to read.</dd></div>
+        <div><dt>Cultural fit</dt><dd>A name, food or custom that needs adapting. Logged as an adaptation, not an error.</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>What we release</h2>
+      <dl class="outs">
+        <div><dt>The dataset</dt><dd>For every sentence: the English source, each model's draft, the corrected text, error tags, ratings and review time. Licensed CC BY 4.0 and posted on Hugging Face with a citable DOI. The first version is due in January 2027.</dd></div>
+        <div><dt>The code</dt><dd>Translation scripts, prompts, the annotation guide and the evaluation code, on GitHub under an open-source license. Adding a new language takes one config file.</dd></div>
+        <div><dt>The findings</dt><dd>Written up and submitted for peer review in 2027, with a free preprint anyone can read.</dd></div>
+      </dl>
+      <p class="small soft" style="margin-top:18px">Links will be added here when the first release is out.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>Consent and privacy</h2>
+      <ul class="plain">
+        <li>Reviewers sign a consent form before any of their corrections enter the dataset. It says the corrections will be public under an open license and may be used for research, including training models.</li>
+        <li>Reviewers appear in the data under an anonymous ID. Names go only in book credits, and only with permission.</li>
+        <li>No children's names, photos or personal details are collected.</li>
+        <li>For Indigenous and small-community languages, the community decides whether the data is released. We follow the CARE Principles for Indigenous Data Governance.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STORY ================= -->
+<section class="page" data-page="story" hidden>
+  <div class="cloth opener">
+    <div class="wrap">
+      <h1>Our story so far</h1>
+      <p class="lede">A student-run nonprofit that began with book drives and now makes the books itself.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <ol class="time">
+        <li>
+          <span class="when">2025</span>
+          <h2>Founded by students</h2>
+          <div class="stack">
+            <p class="dropcap">Books Without Borders began after our founder visited India and saw children kept out of school by poverty and by schools without enough resources. The first idea was to move books and funding from communities with extra to schools that needed them.</p>
+            <p>We registered as a 501(c)(3) nonprofit and set a mission: close the education gap for disadvantaged youth worldwide, so every child can reach their full potential.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">July 2025</span>
+          <h2>Telangana, India</h2>
+          <div class="stack">
+            <p>Our first project supported an under-resourced government school in Telangana serving grades 6 through 10. We collected book donations, raised money locally and funded merit-based scholarships.</p>
+          </div>
+          <div class="ledger">
+            <h3>Summer 2025</h3>
+            <dl>
+              <div class="ln"><dt>Books donated</dt><dd>83</dd></div>
+              <div class="ln"><dt>Students served</dt><dd>240</dd></div>
+              <div class="ln"><dt>Raised in donations</dt><dd>$101</dd></div>
+            </dl>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img src="img/banner.jpg" width="1064" height="784" loading="lazy" alt="A Books Without Borders banner hanging on a classroom wall"><figcaption>Our banner at the school.</figcaption></figure>
+            <figure class="plate"><img src="img/books.jpg" width="1043" height="784" loading="lazy" alt="Stacks of donated paperback books on a desk"><figcaption>Some of the 83 books.</figcaption></figure>
+          </div>
+        </li>
+        <li>
+          <span class="when">Fall 2025</span>
+          <h2>Readathon Revolution</h2>
+          <div class="stack">
+            <p>A two-week reading challenge for U.S. elementary schools, kindergarten through fifth grade. Students set their own reading goals and collected pledges from family and neighbors. We built the toolkit for schools: reading logs, parent letters, donation forms, teacher guides, certificates and classroom leaderboards.</p>
+            <p>The design sent 70% of funds to libraries, tuition and school supply kits in South Sudan and other underserved communities, and returned 30% to each participating school.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">November 2026</span>
+          <h2>Why we changed course</h2>
+          <div class="stack">
+            <p>Collecting and moving physical books was hard to keep going as a student team, and each book could only ever reach one shelf.</p>
+            <p>Meanwhile, for a lot of languages the children's books barely exist. A family can look for a bedtime story in the language they speak at home and find a dozen titles, total.</p>
+            <p>Translation tools have gotten good enough to produce a rough draft in many of those languages. They aren't good enough to hand to a child. Closing that distance takes native speakers, and it's work a small volunteer team can do. So that's now all we do.</p>
+            <p><a href="#method">See how a book is made</a></p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="cloth band">
+    <div class="wrap spread">
+      <div class="stack">
+        <p>What hasn't changed</p>
+        <p class="creed">Education is a right, not a privilege.</p>
+      </div>
+      <div class="stack">
+        <h2>Our mission now</h2>
+        <p class="lede">Books Without Borders makes free children's books in languages that have very few, and shares what the work teaches about how AI handles those languages.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= JOIN ================= -->
+<section class="page" data-page="join" hidden>
+  <div class="cloth opener">
+    <div class="wrap">
+      <h1>Get involved</h1>
+      <p class="lede">The books only work if people who grew up with the language read every line. Tell us who you are and we'll show you where you fit.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>Which of these is you?</h2>
+      <div class="chips" id="roles" role="group" aria-label="Your role"></div>
+      <div class="role">
+        <div class="stack" aria-live="polite">
+          <h3 id="role-title"></h3>
+          <p id="role-what"></p>
+          <p class="soft" id="role-get"></p>
+        </div>
+        <form class="form" id="join-form" novalidate>
+          <label for="join-name">Your name<input id="join-name" name="name" autocomplete="name"></label>
+          <label for="join-detail"><span id="join-detail-label"></span><input id="join-detail" name="detail"></label>
+          <pre class="letter" id="join-letter"></pre>
+          <div class="row">
+            <button class="btn" type="button" id="join-copy">Copy this email</button>
+            <a class="btn line" id="join-mail" href="mailto:info@bwbglobal.org">Open in your mail app</a>
+          </div>
+          <p class="status" id="join-status" aria-live="polite">Send it to info@bwbglobal.org. We reply within 2 to 4 business days.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap spread">
+      <div class="stack">
+        <h2>Start a chapter</h2>
+        <p>A chapter is a small team working on one language: a language lead and a few native-speaker reviewers. We'll open the first new chapter once our first language has 10 finished books.</p>
+        <p>We're writing down everything as we go, from the consent form to the review spreadsheet, so a new team can copy the process without starting over.</p>
+      </div>
+      <div class="stack">
+        <h2>Contact</h2>
+        <p>Email <a href="mailto:info@bwbglobal.org">info@bwbglobal.org</a><br>Instagram <a href="https://www.instagram.com/bwbglobal_org/" target="_blank" rel="noopener">@bwbglobal_org</a></p>
+        <p class="soft">Based in North Texas, United States.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GIVE ================= -->
+<section class="page" data-page="give" hidden>
+  <div class="cloth opener">
+    <div class="wrap">
+      <h1>Donate</h1>
+      <p class="lede">We're a volunteer team, and the books we translate are free to use. Donations cover the parts that cost money.</p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap spread">
+      <div>
+        <h2>What a donation pays for</h2>
+        <dl class="outs">
+          <div><dt>Printing</dt><dd>A small run of each finished book for the families and community partner who helped make it.</dd></div>
+          <div><dt>Translation</dt><dd>The cost of running AI models to write first drafts. We log what every run costs.</dd></div>
+          <div><dt>Thank-yous</dt><dd>Gift cards for the native speakers who review each book.</dd></div>
+        </dl>
+      </div>
+      <div class="ledger stack">
+        <h3>Give online</h3>
+        <p>Our donation form takes one-time, monthly or yearly gifts.</p>
+        <p><a class="btn" href="https://www.bwbglobal.org/donate" target="_blank" rel="noopener">Open the donation form</a></p>
+        <p class="small soft">Books Without Borders is a registered 501(c)(3) nonprofit. EIN 35-2895150.</p>
+        <p class="small soft">To give another way, write to info@bwbglobal.org.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap stack">
+      <h2>No money? Time works too</h2>
+      <p>An hour from a native speaker is worth more to a book than anything we can buy.</p>
+      <p><a class="btn line" href="#join">Get involved</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <div class="cols">
+      <div class="stack">
+        <img class="em" src="img/logo-emblem.png" width="463" height="433" alt="">
+        <h2>Books Without Borders</h2>
+        <p>Free children's books in languages that have very few. A youth-led 501(c)(3) nonprofit, EIN 35-2895150.</p>
+      </div>
+      <div>
+        <h2>Pages</h2>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#method">How a book is made</a></li>
+          <li><a href="#research">Open research</a></li>
+          <li><a href="#story">Our story</a></li>
+          <li><a href="#join">Get involved</a></li>
+          <li><a href="#give">Donate</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Contact</h2>
+        <ul>
+          <li><a href="mailto:info@bwbglobal.org">info@bwbglobal.org</a></li>
+          <li><a href="https://www.instagram.com/bwbglobal_org/" target="_blank" rel="noopener">Instagram @bwbglobal_org</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fine">
+      <p>&copy; 2026 Books Without Borders</p>
+      <p>Colophon: set in Libre Caslon and Gentium Book Plus, a typeface SIL built to cover as many of the world's languages as it can.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- EDIT ME: pilot shelf ----------
+     One entry per pilot book. stage: 0 being chosen, 1 drafted, 2 in review, 3 published.
+     Add a title when a book is picked, e.g. { title: "The Moon Is Sleeping", stage: 2 } */
+  var BOOKS = [
+    { title: "", stage: 0 },
+    { title: "", stage: 0 },
+    { title: "", stage: 0 },
+    { title: "", stage: 0 },
+    { title: "", stage: 0 }
+  ];
+  var STAGES = ["being chosen with our community partner", "drafted by the model", "with native-speaker reviewers", "published"];
+  var SIZES = [[38,148],[30,126],[44,160],[34,138],[40,118]];
+
+  (function shelf(){
+    var el = $("#shelf"), note = $("#shelf-note");
+    var done = BOOKS.filter(function(b){ return b.stage === 3; }).length;
+    var rest = done + " of " + BOOKS.length + " published. All five are due by January 3, 2027.";
+    note.textContent = rest;
+    BOOKS.forEach(function(b, i){
+      var s = document.createElement("button");
+      s.type = "button"; s.className = "spine"; s.dataset.stage = b.stage;
+      s.style.width = SIZES[i % 5][0] + "px"; s.style.height = SIZES[i % 5][1] + "px";
+      var line = "Book " + (i + 1) + (b.title ? ", " + b.title : "") + ": " + STAGES[b.stage] + ".";
+      s.setAttribute("aria-label", line);
+      var on = function(){ note.textContent = line; };
+      var off = function(){ if(!$(".spine.sel", el)) note.textContent = rest; };
+      s.addEventListener("mouseenter", on); s.addEventListener("focus", on);
+      s.addEventListener("mouseleave", off); s.addEventListener("blur", off);
+      s.addEventListener("click", function(){
+        var was = s.classList.contains("sel");
+        $$(".spine", el).forEach(function(x){ x.classList.remove("sel"); });
+        if(!was){ s.classList.add("sel"); on(); } else { note.textContent = rest; }
+      });
+      el.appendChild(s);
+    });
+  })();
+
+  /* ---------- gap chart ---------- */
+  (function gap(){
+    var DATA = [["Telugu",989,2],["Nepali",329,508],["Vietnamese",355,12],["Pashto",126,202],["Amharic",110,86],["Dari",12,118],["Burmese",40,64],["Tigrinya",6,8],["Somali",0,11]]
+      .map(function(d){ return { lang:d[0], sw:d[1], bl:d[2], n:d[1]+d[2] }; })
+      .sort(function(a,b){ return b.n - a.n; });
+    var el = $("#gap"), max = DATA[0].n;
+    var tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; el.appendChild(tip);
+    DATA.forEach(function(d){
+      var row = document.createElement("div");
+      row.className = "bar"; row.tabIndex = 0; row.setAttribute("role","listitem");
+      var split = "StoryWeaver " + d.sw + ", Bloom Library " + d.bl;
+      row.setAttribute("aria-label", d.lang + ": " + d.n + " books. " + split + ".");
+      row.innerHTML = '<span class="lang">' + d.lang + '</span><span class="track"><span class="fill" style="width:' + (d.n / max * 86).toFixed(2) + '%"></span><span class="val">' + d.n + '</span></span>';
+      var show = function(){
+        tip.textContent = d.lang + ": " + split; tip.hidden = false;
+        tip.style.top = (row.offsetTop - 6) + "px";
+        var val = $(".val", row);
+        var left = val.offsetLeft + val.offsetWidth + 14;
+        tip.style.left = Math.max(0, Math.min(left, el.clientWidth - tip.offsetWidth)) + "px";
+        if(left + tip.offsetWidth > el.clientWidth){ tip.style.top = (row.offsetTop - tip.offsetHeight - 2) + "px"; }
+      };
+      var hide = function(){ tip.hidden = true; };
+      row.addEventListener("mouseenter", show); row.addEventListener("focus", show);
+      row.addEventListener("mouseleave", hide); row.addEventListener("blur", hide);
+      row.addEventListener("click", show);
+      el.appendChild(row);
+    });
+  })();
+
+  /* ---------- roadmap: mark the phase we're in today ---------- */
+  (function road(){
+    var today = new Date();
+    $$("#road li").forEach(function(li){
+      var a = new Date(li.dataset.start + "T00:00:00"), b = new Date(li.dataset.end + "T23:59:59");
+      if(today > b){ li.classList.add("done"); }
+      else if(today >= a){
+        li.classList.add("now");
+        var chip = document.createElement("span"); chip.className = "here"; chip.textContent = "we are here";
+        $("h3", li).appendChild(chip);
+      }
+    });
+  })();
+
+  /* ---------- license checker ---------- */
+  (function lic(){
+    var L = [
+      ["CC BY", true, "We keep every credit from the original and add our own."],
+      ["CC BY-SA", true, "Our translation goes out under the same license."],
+      ["CC BY-NC", true, "For the free library, yes. We don't sell printed copies of these."],
+      ["Any NoDerivatives license", false, "NoDerivatives means no adaptations, and a translation is one."],
+      ["All rights reserved", false, "We only translate books whose authors have openly licensed them."]
+    ];
+    var box = $("#lic"), word = $("#lic-word"), why = $("#lic-why");
+    function pick(i){
+      $$(".chip", box).forEach(function(c, j){ c.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+      word.textContent = L[i][1] ? "Yes." : "No."; word.className = L[i][1] ? "" : "no"; why.textContent = L[i][2];
+    }
+    L.forEach(function(l, i){
+      var c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.textContent = l[0];
+      c.addEventListener("click", function(){ pick(i); }); box.appendChild(c);
+    });
+    pick(0);
+  })();
+
+  /* ---------- role picker and email writer ---------- */
+  (function roles(){
+    var R = [
+      { chip:"I speak a language with few children's books", title:"Review a book",
+        what:"You read a short picture book the model has translated, fix what's wrong, and tag each fix using a one-page guide. Two reviewers check every book, working separately. You sign a consent form before you start.",
+        get:"Your name goes in the book's credits if you want it there.",
+        label:"Language you speak", gap:"[language]",
+        line:function(d){ return "I speak " + d + " and I'd like to help review children's book translations."; } },
+      { chip:"I'm part of a community group", title:"Partner with us",
+        what:"Heritage schools, cultural associations, faith communities and resettlement groups help us choose which stories to translate, introduce us to reviewers, and host the first read-aloud.",
+        get:"Your community gets printed copies of every book. We only name a partner publicly with written permission.",
+        label:"Your organization", gap:"[organization]",
+        line:function(d){ return "I'm with " + d + ". I'd like to talk about making children's books in our language together."; } },
+      { chip:"I teach or do research", title:"Mentor the research",
+        what:"If you work in linguistics, translation or natural language processing, we'd value your feedback on our error categories, our evaluation setup and drafts of the write-up.",
+        get:"You're credited in everything we publish.",
+        label:"Your field and institution", gap:"[field and institution]",
+        line:function(d){ return "I work in " + d + ". I'd be glad to give feedback on your research."; } },
+      { chip:"I'm a student", title:"Volunteer",
+        what:"Students lay out finished books, record narration, run story hours and help with outreach. Once our first language has 10 finished books, students can start a chapter for a new one.",
+        get:"We log volunteer hours every month.",
+        label:"Your school", gap:"[school]",
+        line:function(d){ return "I'm a student at " + d + " and I'd like to volunteer."; } },
+      { chip:"I'm a teacher or librarian", title:"Host a story hour",
+        what:"Bring the books to the families you already serve. We'll come read, or send you the free digital and audio versions to use yourself.",
+        get:"Printed copies carry a QR code that opens the free versions.",
+        label:"Your school or library", gap:"[school or library]",
+        line:function(d){ return "I work at " + d + ". I'd like to host a story hour or share your books with families."; } }
+    ];
+    var box = $("#roles"), cur = 0;
+    var name = $("#join-name"), detail = $("#join-detail"), letter = $("#join-letter"), mail = $("#join-mail"), status = $("#join-status");
+    var rest = status.textContent;
+    function write(){
+      var r = R[cur], n = name.value.trim() || "[your name]", d = detail.value.trim() || r.gap;
+      var body = "Hi Books Without Borders,\n\nMy name is " + n + ". " + r.line(d) + "\n\nThanks,\n" + n;
+      letter.textContent = body;
+      mail.href = "mailto:info@bwbglobal.org?subject=" + encodeURIComponent(r.title) + "&body=" + encodeURIComponent(body);
+    }
+    function pick(i){
+      cur = i; var r = R[i];
+      $$(".chip", box).forEach(function(c, j){ c.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+      $("#role-title").textContent = r.title; $("#role-what").textContent = r.what; $("#role-get").textContent = r.get;
+      $("#join-detail-label").textContent = r.label; write();
+    }
+    R.forEach(function(r, i){
+      var c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.textContent = r.chip;
+      c.addEventListener("click", function(){ pick(i); }); box.appendChild(c);
+    });
+    name.addEventListener("input", write); detail.addEventListener("input", write);
+    $("#join-form").addEventListener("submit", function(e){ e.preventDefault(); });
+    $("#join-copy").addEventListener("click", function(){
+      var text = letter.textContent;
+      var ok = function(){ status.textContent = "Copied. Paste it into an email to info@bwbglobal.org."; };
+      var no = function(){
+        var sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(letter); sel.removeAllRanges(); sel.addRange(range);
+        status.textContent = "Couldn't copy automatically. The email is selected, so press Ctrl+C or Cmd+C, then send it to info@bwbglobal.org.";
+      };
+      try { navigator.clipboard.writeText(text).then(ok, no); } catch(e){ no(); }
+      setTimeout(function(){ status.textContent = rest; }, 9000);
+    });
+    pick(0);
+  })();
+
+  /* ---------- scrolly on the method page ---------- */
+  var steps = $$("#steps .step"), sheets = steps.map(function(s){ return $(".sheet", s); }), panel = $("#panel");
+  var wide = window.matchMedia("(min-width: 860px)");
+  function setStep(i){
+    steps.forEach(function(s, j){ s.classList.toggle("on", j === i); });
+    sheets.forEach(function(s, j){ s.classList.toggle("on", j === i); });
+  }
+  function place(){
+    steps.forEach(function(s, i){ (wide.matches ? panel : s).appendChild(sheets[i]); });
+    panel.setAttribute("aria-hidden", "false");
+    if(!wide.matches){ steps.forEach(function(s){ s.classList.add("on"); }); } else { setStep(0); }
+  }
+  place();
+  if(wide.addEventListener){ wide.addEventListener("change", place); }
+  if("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      if(!wide.matches) return;
+      entries.forEach(function(e){ if(e.isIntersecting){ setStep(steps.indexOf(e.target)); } });
+    }, { rootMargin: "-45% 0px -45% 0px" });
+    steps.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---------- ribbon ---------- */
+  var root = document.documentElement, ticking = false;
+  function ribbon(){
+    var h = root.scrollHeight - window.innerHeight;
+    root.style.setProperty("--p", h > 0 ? Math.min(1, window.scrollY / h).toFixed(4) : 0);
+    ticking = false;
+  }
+  window.addEventListener("scroll", function(){ if(!ticking){ ticking = true; requestAnimationFrame(ribbon); } }, { passive:true });
+  window.addEventListener("resize", ribbon);
+
+  /* ---------- pages: route on the hash, turn a leaf between them ---------- */
+  var pages = $$(".page"), names = pages.map(function(p){ return p.dataset.page; });
+  var links = $$(".nav a"), leaf = $(".leaf"), nav = $("#site-nav"), menu = $("#menu-btn"), current = null, timer = null;
+  function show(name){
+    pages.forEach(function(p){ p.hidden = p.dataset.page !== name; });
+    links.forEach(function(a){
+      if(a.getAttribute("href") === "#" + name){ a.setAttribute("aria-current", "page"); } else { a.removeAttribute("aria-current"); }
+    });
+    current = name;
+    root.style.scrollBehavior = "auto"; window.scrollTo(0, 0); root.style.scrollBehavior = "";
+    ribbon();
+  }
+  function route(first){
+    var h = location.hash.slice(1);
+    if(h && names.indexOf(h) < 0) return;          // an in-page anchor, not a page
+    var name = h || "home";
+    nav.classList.remove("open"); menu.setAttribute("aria-expanded", "false");
+    if(name === current) return;
+    if(first === true || calm){ show(name); return; }
+    clearTimeout(timer);
+    leaf.classList.remove("turn"); void leaf.offsetWidth; leaf.classList.add("turn");
+    timer = setTimeout(function(){ show(name); }, 340);
+  }
+  leaf.addEventListener("animationend", function(){ leaf.classList.remove("turn"); });
+  window.addEventListener("hashchange", route);
+  menu.addEventListener("click", function(){
+    var open = nav.classList.toggle("open"); menu.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  route(true);
+})();
+</script>
+</body>
+</html>
